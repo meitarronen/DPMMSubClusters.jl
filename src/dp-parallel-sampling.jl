@@ -321,7 +321,7 @@ function dp_parallel(model_params::String; verbose = true, gt = nothing)
     return run_model(dp_model, 1 ,model_params)
 end
 
-function run_model(dp_model, first_iter, model_params="none", prev_time = 0)
+function run_model(dp_model, first_iter, model_params="none", prev_time = 0, no_splits = True)
     start_time= time()
     iter_count = []
     liklihood_history = []
@@ -344,8 +344,11 @@ function run_model(dp_model, first_iter, model_params="none", prev_time = 0)
         if i >= iterations - argmax_sample_stop #We assume the cluters k has been setteled by now, and a low probability random split can do dmg
             final = true
         end
-        if i >= iterations - split_stop || length(dp_model.group.local_clusters) >= max_num_of_clusters
-            no_more_splits = true
+        if no_splits # just a gmm
+            no_more_splits = true 
+        else
+            if i >= iterations - split_stop || length(dp_model.group.local_clusters) >= max_num_of_clusters #how it was before
+                no_more_splits = true
         end
 
         prev_time = time()
